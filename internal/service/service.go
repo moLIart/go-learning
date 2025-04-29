@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"log"
 	"math/rand"
 	"sync"
@@ -11,7 +12,7 @@ import (
 	"github.com/moLIart/go-course/internal/repository"
 )
 
-func StartProcessing(interval time.Duration) {
+func StartProcessing(ctx context.Context, interval time.Duration) {
 	dataChannel := make(chan interface{})
 	var wg sync.WaitGroup
 
@@ -22,30 +23,46 @@ func StartProcessing(interval time.Duration) {
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 
-		for range ticker.C {
-			var entity interface{}
-			switch rand.Intn(4) {
-			case 0:
-				entity = room.NewRoom("room123")
-			case 1:
-				entity = game.NewGame()
-			case 2:
-				entity = game.NewBoard(17)
-			case 3:
-				entity = room.NewPlayer("player123")
-			}
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				var entity interface{}
+				switch rand.Intn(4) {
+				case 0:
+					entity = room.NewRoom("room123")
+				case 1:
+					entity = game.NewGame()
+				case 2:
+					entity = game.NewBoard(17)
+				case 3:
+					entity = room.NewPlayer("player123")
+				}
 
-			dataChannel <- entity
+				select {
+				case dataChannel <- entity:
+				case <-ctx.Done():
+					return
+				}
+			}
 		}
-		close(dataChannel)
 	}()
 
 	// Горутина для добавления данных в репозиторий
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for entity := range dataChannel {
-			repository.AddEntity(entity)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case entity, ok := <-dataChannel:
+				if !ok {
+					return
+				}
+				repository.AddEntity(entity)
+			}
 		}
 	}()
 
@@ -63,21 +80,26 @@ func StartProcessing(interval time.Duration) {
 			"games":   0,
 		}
 
-		for range ticker.C {
-			currentCounts := map[string]int{
-				"players": repository.GetPlayersCount(),
-				"rooms":   repository.GetRoomsCount(),
-				"boards":  repository.GetBoardsCount(),
-				"games":   repository.GetGamesCount(),
-			}
-
-			for key, prevCount := range prevCounts {
-				if currentCounts[key] > prevCount {
-					log.Printf("New %s added: %d\n", key, currentCounts[key]-prevCount)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				currentCounts := map[string]int{
+					"players": repository.GetPlayersCount(),
+					"rooms":   repository.GetRoomsCount(),
+					"boards":  repository.GetBoardsCount(),
+					"games":   repository.GetGamesCount(),
 				}
-			}
 
-			prevCounts = currentCounts
+				for key, prevCount := range prevCounts {
+					if currentCounts[key] > prevCount {
+						log.Printf("New %s added: %d\n", key, currentCounts[key]-prevCount)
+					}
+				}
+
+				prevCounts = currentCounts
+			}
 		}
 	}()
 
