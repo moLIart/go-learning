@@ -39,3 +39,27 @@ func GetNumOfEntities() int {
 
 	return len(players) + len(rooms) + len(boards) + len(games)
 }
+
+func GetPlayersCount() int {
+	mu.Lock()
+	defer mu.Unlock()
+	return len(players)
+}
+
+func GetRoomsCount() int {
+	mu.Lock()
+	defer mu.Unlock()
+	return len(rooms)
+}
+
+func GetBoardsCount() int {
+	mu.Lock()
+	defer mu.Unlock()
+	return len(boards)
+}
+
+func GetGamesCount() int {
+	mu.Lock()
+	defer mu.Unlock()
+	return len(games)
+}

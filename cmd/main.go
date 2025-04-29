@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	service.StartProcessing(7 * time.Second)
+	service.StartProcessing(19 * time.Millisecond)
 }
