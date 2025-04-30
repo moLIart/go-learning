@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"encoding/json"
+	"os"
 	"sync"
 
 	"github.com/moLIart/go-course/internal/model/game"
@@ -15,6 +17,13 @@ var (
 	mu      sync.Mutex
 )
 
+const (
+	playersFile = "players.json"
+	roomsFile   = "rooms.json"
+	boardsFile  = "boards.json"
+	gamesFile   = "games.json"
+)
+
 type Entity interface{}
 
 func AddEntity(entity Entity) {
@@ -22,22 +31,55 @@ func AddEntity(entity Entity) {
 	defer mu.Unlock()
 
 	switch e := entity.(type) {
-	case *room.Room:
-		rooms = append(rooms, e)
 	case *room.Player:
 		players = append(players, e)
+		saveToFile(playersFile, players)
+	case *room.Room:
+		rooms = append(rooms, e)
+		saveToFile(roomsFile, rooms)
 	case *game.Board:
 		boards = append(boards, e)
+		saveToFile(boardsFile, boards)
 	case *game.Game:
 		games = append(games, e)
+		saveToFile(gamesFile, games)
 	}
 }
 
-func GetNumOfEntities() int {
-	mu.Lock()
-	defer mu.Unlock()
+func saveToFile(filename string, data interface{}) {
+	file, err := os.Create(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
 
-	return len(players) + len(rooms) + len(boards) + len(games)
+	encoder := json.NewEncoder(file)
+	if err := encoder.Encode(data); err != nil {
+		panic(err)
+	}
+}
+
+func LoadData() {
+	loadFromFile(playersFile, &players)
+	loadFromFile(roomsFile, &rooms)
+	loadFromFile(boardsFile, &boards)
+	loadFromFile(gamesFile, &games)
+}
+
+func loadFromFile(filename string, target interface{}) {
+	file, err := os.Open(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return
+		}
+		panic(err)
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(target); err != nil {
+		panic(err)
+	}
 }
 
 func GetPlayersCount() int {

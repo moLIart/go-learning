@@ -7,10 +7,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/moLIart/go-course/internal/repository"
 	"github.com/moLIart/go-course/internal/service"
 )
 
 func main() {
+	repository.LoadData()
+
 	ctx, cancel := context.WithCancel(context.Background())
 
 	signalChan := make(chan os.Signal, 1)

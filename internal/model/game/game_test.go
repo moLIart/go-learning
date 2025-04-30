@@ -24,8 +24,8 @@ func TestNewGameWithSize(t *testing.T) {
 	size := 7
 	game := NewGame(WithSize(size))
 
-	if game.GetBoard().Size() != size {
-		t.Errorf("expected board size %d, got %d", size, game.GetBoard().Size())
+	if game.GetBoard().GetSize() != size {
+		t.Errorf("expected board size %d, got %d", size, game.GetBoard().GetSize())
 	}
 }
 
