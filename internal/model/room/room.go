@@ -5,6 +5,7 @@ import (
 )
 
 type Room struct {
+	ID      int
 	Code    string
 	Players [2]*Player
 	Game    *game.Game
@@ -14,7 +15,7 @@ func NewRoom(code string) *Room {
 	return &Room{
 		Code:    code,
 		Players: [2]*Player{},
-		Game:    game.NewGame(),
+		Game:    nil,
 	}
 }
 
@@ -24,6 +25,10 @@ func (r *Room) GetCode() string {
 
 func (r *Room) GetGame() *game.Game {
 	return r.Game
+}
+
+func (r *Room) SetGame(game *game.Game) {
+	r.Game = game
 }
 
 func (r *Room) AddPlayer(player *Player) bool {
