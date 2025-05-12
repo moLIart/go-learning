@@ -22,16 +22,19 @@ func main() {
 	router.POST("/players", handlers.CreatePlayerHandler)
 	router.GET("/players", handlers.GetPlayersHandler)
 	router.GET("/players/:id", handlers.GetPlayerByIDHandler)
+	router.PUT("/players/:id", handlers.UpdatePlayerHandler)
 	router.DELETE("/players/:id", handlers.DeletePlayerByIDHandler)
 
 	router.POST("/rooms", handlers.CreateRoomHandler)
 	router.GET("/rooms", handlers.GetRoomsHandler)
 	router.GET("/rooms/:id", handlers.GetRoomByIDHandler)
+	router.PUT("/rooms/:id", handlers.UpdateRoomHandler)
 	router.DELETE("/rooms/:id", handlers.DeleteRoomHandler)
 
 	router.POST("/boards", handlers.CreateBoardHandler)
 	router.GET("/boards", handlers.GetBoardsHandler)
 	router.GET("/boards/:id", handlers.GetBoardByIDHandler)
+	router.PUT("/boards/:id", handlers.UpdateBoardHandler)
 	router.DELETE("/boards/:id", handlers.DeleteBoardHandler)
 
 	router.POST("/games", handlers.CreateGameHandler)

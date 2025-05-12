@@ -70,3 +70,24 @@ func DeletePlayerByIDHandler(w http.ResponseWriter, r *http.Request, ps httprout
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func UpdatePlayerHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, err := strconv.Atoi(ps.ByName("id"))
+	if err != nil {
+		http.Error(w, "Invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	var playerDto dto.UpdatePlayerDto
+	if err := json.NewDecoder(r.Body).Decode(&playerDto); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if !repository.UpdatePlayerByID(id, playerDto.Name) {
+		http.Error(w, "Player not found", http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

@@ -71,3 +71,24 @@ func DeleteBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func UpdateBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, err := strconv.Atoi(ps.ByName("id"))
+	if err != nil {
+		http.Error(w, "Invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	var boardDto dto.UpdateBoardDto
+	if err := json.NewDecoder(r.Body).Decode(&boardDto); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if !repository.UpdateBoardByID(id, boardDto.Size) {
+		http.Error(w, "Board not found", http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

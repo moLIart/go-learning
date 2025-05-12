@@ -238,3 +238,33 @@ func DeleteGameByID(id int) bool {
 	}
 	return false
 }
+
+func UpdatePlayerByID(id int, name string) bool {
+	for i, player := range players {
+		if player.ID == id {
+			players[i].Name = name
+			return true
+		}
+	}
+	return false
+}
+
+func UpdateRoomByID(id int, code string) bool {
+	for i, room := range rooms {
+		if room.ID == id {
+			rooms[i].Code = code
+			return true
+		}
+	}
+	return false
+}
+
+func UpdateBoardByID(id int, size int) bool {
+	for i, board := range boards {
+		if board.ID == id {
+			boards[i].Size = size
+			return true
+		}
+	}
+	return false
+}

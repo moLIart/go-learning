@@ -72,3 +72,24 @@ func DeleteRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func UpdateRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id, err := strconv.Atoi(ps.ByName("id"))
+	if err != nil {
+		http.Error(w, "Invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	var roomDto dto.UpdateRoomDto
+	if err := json.NewDecoder(r.Body).Decode(&roomDto); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if !repository.UpdateRoomByID(id, roomDto.Code) {
+		http.Error(w, "Room not found", http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
