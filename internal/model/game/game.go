@@ -10,6 +10,7 @@ const (
 )
 
 type Game struct {
+	ID          int
 	Board       *Board
 	CurrentTurn CellState
 	Status      GameStatus

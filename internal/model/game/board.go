@@ -9,6 +9,7 @@ const (
 )
 
 type Board struct {
+	ID    int
 	Size  int
 	Cells [][]CellState
 }
@@ -18,16 +19,13 @@ func (b Board) GetSize() int {
 }
 
 func NewBoard(size int) *Board {
-	// create
 	board := &Board{
 		Size:  size,
 		Cells: make([][]CellState, size),
 	}
 
-	// initialize
 	for i := 0; i < size; i++ {
 		board.Cells[i] = make([]CellState, size)
-
 		for j := 0; j < size; j++ {
 			board.Cells[i][j] = Empty
 		}

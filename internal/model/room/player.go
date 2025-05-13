@@ -1,6 +1,7 @@
 package room
 
 type Player struct {
+	ID   int
 	Name string
 }
 
