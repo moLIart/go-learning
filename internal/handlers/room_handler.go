@@ -13,15 +13,18 @@ import (
 )
 
 // CreateRoomHandler creates a new room.
-// @Summary Create a new room
-// @Description Creates a new room with the given code and adds it to the repository.
-// @Tags rooms
-// @Accept json
-// @Produce json
-// @Param room body dto.CreateRoomDto true "Room code"
-// @Success 201 {object} dto.GetRoomDto
-// @Failure 400 {string} string "Invalid request body"
-// @Router /rooms [post]
+//
+//	@Summary		Create a new room (Requires authorization)
+//	@Description	Creates a new room with the given code and adds it to the repository.
+//	@Tags			rooms
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string				true	"Authorization"
+//	@Param			room			body		dto.CreateRoomDto	true	"Room code"
+//	@Success		201				{object}	dto.GetRoomDto
+//	@Failure		400				{string}	string	"Invalid request body"
+//	@Security		BearerAuth
+//	@Router			/rooms [post]
 func CreateRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var roomDto dto.CreateRoomDto
@@ -36,13 +39,14 @@ func CreateRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 }
 
 // GetRoomsHandler retrieves all rooms.
-// @Summary Get all rooms
-// @Description Returns a list of all rooms.
-// @Tags rooms
-// @Produce json
-// @Success 200 {array} dto.GetRoomDto
-// @Failure 500 {string} string "Failed to encode rooms"
-// @Router /rooms [get]
+//
+//	@Summary		Get all rooms
+//	@Description	Returns a list of all rooms.
+//	@Tags			rooms
+//	@Produce		json
+//	@Success		200	{array}		dto.GetRoomDto
+//	@Failure		500	{string}	string	"Failed to encode rooms"
+//	@Router			/rooms [get]
 func GetRoomsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	rooms := repository.GetRooms()
 	roomDtos := make([]dto.GetRoomDto, len(rooms))
@@ -57,15 +61,16 @@ func GetRoomsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 }
 
 // GetRoomByIDHandler retrieves a room by its ID.
-// @Summary Get room by ID
-// @Description Returns a room by its ID.
-// @Tags rooms
-// @Produce json
-// @Param id path int true "Room ID"
-// @Success 200 {object} dto.GetRoomDto
-// @Failure 400 {string} string "Invalid id parameter"
-// @Failure 404 {string} string "Room not found"
-// @Router /rooms/{id} [get]
+//
+//	@Summary		Get room by ID
+//	@Description	Returns a room by its ID.
+//	@Tags			rooms
+//	@Produce		json
+//	@Param			id	path		int	true	"Room ID"
+//	@Success		200	{object}	dto.GetRoomDto
+//	@Failure		400	{string}	string	"Invalid id parameter"
+//	@Failure		404	{string}	string	"Room not found"
+//	@Router			/rooms/{id} [get]
 func GetRoomByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id, err := strconv.Atoi(ps.ByName("id"))
 	if err != nil {
@@ -87,14 +92,17 @@ func GetRoomByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 }
 
 // DeleteRoomHandler deletes a room by its ID.
-// @Summary Delete room by ID
-// @Description Deletes a room by its ID.
-// @Tags rooms
-// @Param id path int true "Room ID"
-// @Success 200 {string} string "OK"
-// @Failure 400 {string} string "Invalid id parameter"
-// @Failure 404 {string} string "Room not found"
-// @Router /rooms/{id} [delete]
+//
+//	@Summary		Delete room by ID (Requires authorization)
+//	@Description	Deletes a room by its ID.
+//	@Tags			rooms
+//	@Param			Authorization	header		string	true	"Authorization"
+//	@Param			id				path		int		true	"Room ID"
+//	@Success		200				{string}	string	"OK"
+//	@Failure		400				{string}	string	"Invalid id parameter"
+//	@Failure		404				{string}	string	"Room not found"
+//	@Security		BearerAuth
+//	@Router			/rooms/{id} [delete]
 func DeleteRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id, err := strconv.Atoi(ps.ByName("id"))
 	if err != nil {
@@ -111,16 +119,19 @@ func DeleteRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 }
 
 // UpdateRoomHandler updates a room's code by its ID.
-// @Summary Update room by ID
-// @Description Updates the code of a room by its ID.
-// @Tags rooms
-// @Accept json
-// @Param id path int true "Room ID"
-// @Param room body dto.UpdateRoomDto true "Updated room code"
-// @Success 200 {string} string "OK"
-// @Failure 400 {string} string "Invalid id parameter or request body"
-// @Failure 404 {string} string "Room not found"
-// @Router /rooms/{id} [put]
+//
+//	@Summary		Update room by ID (Requires authorization)
+//	@Description	Updates the code of a room by its ID.
+//	@Tags			rooms
+//	@Accept			json
+//	@Param			Authorization	header		string				true	"Authorization"
+//	@Param			id				path		int					true	"Room ID"
+//	@Param			room			body		dto.UpdateRoomDto	true	"Updated room code"
+//	@Success		200				{string}	string				"OK"
+//	@Failure		400				{string}	string				"Invalid id parameter or request body"
+//	@Failure		404				{string}	string				"Room not found"
+//	@Security		BearerAuth
+//	@Router			/rooms/{id} [put]
 func UpdateRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id, err := strconv.Atoi(ps.ByName("id"))
 	if err != nil {

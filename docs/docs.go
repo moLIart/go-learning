@@ -391,7 +391,7 @@ const docTemplate = `{
             }
         },
         "/login": {
-            "get": {
+            "post": {
                 "description": "Authenticates user with login and password from environment variables. Returns JWT token on success.",
                 "consumes": [
                     "application/json"

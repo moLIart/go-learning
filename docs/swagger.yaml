@@ -317,7 +317,7 @@ paths:
       tags:
       - games
   /login:
-    get:
+    post:
       consumes:
       - application/json
       description: Authenticates user with login and password from environment variables.

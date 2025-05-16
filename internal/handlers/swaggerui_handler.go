@@ -6,7 +6,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	// This is for Swagger documentation
-	_ "github.com/moLIart/go-course/internal/docs"
+	_ "github.com/moLIart/go-course/docs"
 )
 
 func SwaggerUIHandler() http.Handler {

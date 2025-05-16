@@ -1,7 +1,10 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API Server",
+        "title": "Test API Server",
+        "contact": {},
+        "version": "1"
     },
     "paths": {
         "/boards": {
@@ -33,6 +36,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new board with the given size and adds it to the repository.",
                 "consumes": [
                     "application/json"
@@ -43,8 +51,15 @@
                 "tags": [
                     "boards"
                 ],
-                "summary": "Create a new board",
+                "summary": "Create a new board (Requires authorization)",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Board size",
                         "name": "board",
@@ -112,6 +127,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Updates the size of a board by its ID.",
                 "consumes": [
                     "application/json"
@@ -119,8 +139,15 @@
                 "tags": [
                     "boards"
                 ],
-                "summary": "Update board by ID",
+                "summary": "Update board by ID (Requires authorization)",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Board ID",
@@ -160,12 +187,24 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes a board by its ID.",
                 "tags": [
                     "boards"
                 ],
-                "summary": "Delete board by ID",
+                "summary": "Delete board by ID (Requires authorization)",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Board ID",
@@ -225,11 +264,25 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new game and adds it to the repository.",
                 "tags": [
                     "games"
                 ],
-                "summary": "Create a new game",
+                "summary": "Create a new game (Requires authorization)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -281,12 +334,24 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes a game by its ID.",
                 "tags": [
                     "games"
                 ],
-                "summary": "Delete game by ID",
+                "summary": "Delete game by ID (Requires authorization)",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Game ID",
@@ -310,6 +375,58 @@
                     },
                     "404": {
                         "description": "Game not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "get": {
+                "description": "Authenticates user with login and password from environment variables. Returns JWT token on success.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "Login credentials",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Could not generate token",
                         "schema": {
                             "type": "string"
                         }
@@ -346,6 +463,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new player with the given name and adds it to the repository.",
                 "consumes": [
                     "application/json"
@@ -356,7 +478,7 @@
                 "tags": [
                     "players"
                 ],
-                "summary": "Create a new player",
+                "summary": "Create a new player (Requires authorization)",
                 "parameters": [
                     {
                         "description": "Player name",
@@ -425,6 +547,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Updates the name of a player by their ID.",
                 "consumes": [
                     "application/json"
@@ -432,7 +559,7 @@
                 "tags": [
                     "players"
                 ],
-                "summary": "Update player by ID",
+                "summary": "Update player by ID (Requires authorization)",
                 "parameters": [
                     {
                         "type": "integer",
@@ -473,11 +600,16 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes a player by their ID.",
                 "tags": [
                     "players"
                 ],
-                "summary": "Delete player by ID",
+                "summary": "Delete player by ID (Requires authorization)",
                 "parameters": [
                     {
                         "type": "integer",
@@ -538,6 +670,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new room with the given code and adds it to the repository.",
                 "consumes": [
                     "application/json"
@@ -548,8 +685,15 @@
                 "tags": [
                     "rooms"
                 ],
-                "summary": "Create a new room",
+                "summary": "Create a new room (Requires authorization)",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Room code",
                         "name": "room",
@@ -617,6 +761,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Updates the code of a room by its ID.",
                 "consumes": [
                     "application/json"
@@ -624,8 +773,15 @@
                 "tags": [
                     "rooms"
                 ],
-                "summary": "Update room by ID",
+                "summary": "Update room by ID (Requires authorization)",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Room ID",
@@ -665,12 +821,24 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes a room by its ID.",
                 "tags": [
                     "rooms"
                 ],
-                "summary": "Delete room by ID",
+                "summary": "Delete room by ID (Requires authorization)",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Room ID",
@@ -791,6 +959,32 @@
                     "type": "string"
                 }
             }
+        },
+        "handlers.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }
