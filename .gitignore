@@ -1,4 +1,5 @@
 # ignore emacs backups
 *~
 
-*.json
+/*.json
+/cmd/*.json
