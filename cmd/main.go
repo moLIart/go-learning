@@ -42,6 +42,8 @@ func main() {
 	router.GET("/games/:id", handlers.GetGameByIDHandler)
 	router.DELETE("/games/:id", handlers.DeleteGameHandler)
 
+	router.Handler("GET", "/swagger/*any", handlers.SwaggerUIHandler())
+
 	srv := &http.Server{
 		Addr:    ":8081",
 		Handler: router,
