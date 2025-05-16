@@ -12,6 +12,16 @@ import (
 	"github.com/moLIart/go-course/internal/repository"
 )
 
+// CreateBoardHandler creates a new board with the specified size.
+// @Summary Create a new board
+// @Description Creates a new board with the given size and adds it to the repository.
+// @Tags boards
+// @Accept json
+// @Produce json
+// @Param board body dto.CreateBoardDto true "Board size"
+// @Success 201 {object} dto.GetBoardDto
+// @Failure 400 {string} string "Invalid request body"
+// @Router /boards [post]
 func CreateBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var boardDto dto.CreateBoardDto
 	if err := json.NewDecoder(r.Body).Decode(&boardDto); err != nil {
@@ -24,6 +34,14 @@ func CreateBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	w.WriteHeader(http.StatusCreated)
 }
 
+// GetBoardsHandler retrieves all boards.
+// @Summary Get all boards
+// @Description Returns a list of all boards.
+// @Tags boards
+// @Produce json
+// @Success 200 {array} dto.GetBoardDto
+// @Failure 500 {string} string "Failed to encode boards"
+// @Router /boards [get]
 func GetBoardsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	boards := repository.GetBoards()
 	boardDtos := make([]dto.GetBoardDto, len(boards))
@@ -37,6 +55,16 @@ func GetBoardsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	}
 }
 
+// GetBoardByIDHandler retrieves a board by its ID.
+// @Summary Get board by ID
+// @Description Returns a board by its ID.
+// @Tags boards
+// @Produce json
+// @Param id path int true "Board ID"
+// @Success 200 {object} dto.GetBoardDto
+// @Failure 400 {string} string "Invalid id parameter"
+// @Failure 404 {string} string "Board not found"
+// @Router /boards/{id} [get]
 func GetBoardByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id, err := strconv.Atoi(ps.ByName("id"))
 	if err != nil {
@@ -57,6 +85,15 @@ func GetBoardByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 }
 
+// DeleteBoardHandler deletes a board by its ID.
+// @Summary Delete board by ID
+// @Description Deletes a board by its ID.
+// @Tags boards
+// @Param id path int true "Board ID"
+// @Success 200 {string} string "OK"
+// @Failure 400 {string} string "Invalid id parameter"
+// @Failure 404 {string} string "Board not found"
+// @Router /boards/{id} [delete]
 func DeleteBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id, err := strconv.Atoi(ps.ByName("id"))
 	if err != nil {
@@ -72,6 +109,17 @@ func DeleteBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	w.WriteHeader(http.StatusOK)
 }
 
+// UpdateBoardHandler updates a board's size by its ID.
+// @Summary Update board by ID
+// @Description Updates the size of a board by its ID.
+// @Tags boards
+// @Accept json
+// @Param id path int true "Board ID"
+// @Param board body dto.UpdateBoardDto true "Updated board size"
+// @Success 200 {string} string "OK"
+// @Failure 400 {string} string "Invalid id parameter or request body"
+// @Failure 404 {string} string "Board not found"
+// @Router /boards/{id} [put]
 func UpdateBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id, err := strconv.Atoi(ps.ByName("id"))
 	if err != nil {
