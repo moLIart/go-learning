@@ -19,7 +19,6 @@ import (
 //	@Tags			boards
 //	@Accept			json
 //	@Produce		json
-//	@Param			Authorization	header		string				true	"Authorization"
 //	@Param			board			body		dto.CreateBoardDto	true	"Board size"
 //	@Success		201				{object}	dto.GetBoardDto
 //	@Failure		400				{string}	string	"Invalid request body"
@@ -95,7 +94,6 @@ func GetBoardByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //	@Summary		Delete board by ID (Requires authorization)
 //	@Description	Deletes a board by its ID.
 //	@Tags			boards
-//	@Param			Authorization	header		string	true	"Authorization"
 //	@Param			id				path		int		true	"Board ID"
 //	@Success		200				{string}	string	"OK"
 //	@Failure		400				{string}	string	"Invalid id parameter"
@@ -123,7 +121,6 @@ func DeleteBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 //	@Description	Updates the size of a board by its ID.
 //	@Tags			boards
 //	@Accept			json
-//	@Param			Authorization	header		string				true	"Authorization"
 //	@Param			id				path		int					true	"Board ID"
 //	@Param			board			body		dto.UpdateBoardDto	true	"Updated board size"
 //	@Success		200				{string}	string				"OK"

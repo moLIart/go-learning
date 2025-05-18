@@ -56,7 +56,6 @@ func main() {
 	router.GET("/games/:id", handlers.GetGameByIDHandler)
 	router.DELETE("/games/:id", middlewares.JWTAuth(handlers.DeleteGameHandler))
 
-	router.POST("/login", handlers.LoginHandler)
 	router.Handler("GET", "/swagger/*any", handlers.SwaggerUIHandler())
 
 	srv := &http.Server{

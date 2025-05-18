@@ -16,7 +16,6 @@ import (
 //	@Summary		Create a new game (Requires authorization)
 //	@Description	Creates a new game and adds it to the repository.
 //	@Tags			games
-//	@Param			Authorization	header		string	true	"Authorization"
 //	@Success		201				{object}	dto.GetGameDto
 //	@Security		BearerAuth
 //	@Router			/games [post]
@@ -84,7 +83,6 @@ func GetGameByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 //	@Summary		Delete game by ID (Requires authorization)
 //	@Description	Deletes a game by its ID.
 //	@Tags			games
-//	@Param			Authorization	header		string	true	"Authorization"
 //	@Param			id				query		int		true	"Game ID"
 //	@Success		200				{string}	string	"OK"
 //	@Failure		400				{string}	string	"Invalid id parameter"

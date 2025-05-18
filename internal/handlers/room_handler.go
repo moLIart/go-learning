@@ -19,7 +19,6 @@ import (
 //	@Tags			rooms
 //	@Accept			json
 //	@Produce		json
-//	@Param			Authorization	header		string				true	"Authorization"
 //	@Param			room			body		dto.CreateRoomDto	true	"Room code"
 //	@Success		201				{object}	dto.GetRoomDto
 //	@Failure		400				{string}	string	"Invalid request body"
@@ -96,7 +95,6 @@ func GetRoomByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 //	@Summary		Delete room by ID (Requires authorization)
 //	@Description	Deletes a room by its ID.
 //	@Tags			rooms
-//	@Param			Authorization	header		string	true	"Authorization"
 //	@Param			id				path		int		true	"Room ID"
 //	@Success		200				{string}	string	"OK"
 //	@Failure		400				{string}	string	"Invalid id parameter"
@@ -124,7 +122,6 @@ func DeleteRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //	@Description	Updates the code of a room by its ID.
 //	@Tags			rooms
 //	@Accept			json
-//	@Param			Authorization	header		string				true	"Authorization"
 //	@Param			id				path		int					true	"Room ID"
 //	@Param			room			body		dto.UpdateRoomDto	true	"Updated room code"
 //	@Success		200				{string}	string				"OK"
