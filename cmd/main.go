@@ -32,6 +32,8 @@ func main() {
 
 	repository.LoadData()
 
+	middlewares.SetJwtSecret(os.Getenv("JWT_SECRET"))
+
 	router := httprouter.New()
 	router.POST("/players", middlewares.JWTAuth(handlers.CreatePlayerHandler))
 	router.GET("/players", handlers.GetPlayersHandler)
