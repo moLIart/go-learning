@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package api.contract;
+
+option go_package = "./internal/grpc/generated";
+
+import "google/protobuf/empty.proto";
+
+message RequestEntity {
+  int32 id = 1;
+}
+
+message CreatePlayerDto {
+  string name = 1;
+}
+
+message UpdatePlayerDto {
+  int32 id = 1;
+  string name = 2;
+}
+
+message GetPlayerDto {
+  int32 id = 1;
+  string name = 2;
+}
+
+message CreateRoomDto {
+  string code = 1;
+}
+
+message UpdateRoomDto {
+  int32 id = 1;
+  string code = 2;
+}
+
+message GetRoomDto {
+  int32 id = 1;
+  string code = 2;
+}
+
+message CreateBoardDto {
+  int32 size = 1;
+}
+
+message UpdateBoardDto {
+  int32 id = 1;
+  int32 size = 2;
+}
+
+message GetBoardDto {
+  int32 id = 1;
+  int32 size = 2;
+}
+
+message GetGameDto {
+  int32 id = 1;
+}
+
+message PlayerList {
+  repeated GetPlayerDto players = 1;
+}
+
+message RoomList {
+  repeated GetRoomDto rooms = 1;
+}
+
+message BoardList {
+  repeated GetBoardDto boards = 1;
+}
+
+message GameList {
+  repeated GetGameDto games = 1;
+}
+
+// Player service
+service PlayerService {
+  rpc GetPlayer (RequestEntity) returns (GetPlayerDto);
+  rpc GetAllPlayers (google.protobuf.Empty) returns (PlayerList);
+  rpc CreatePlayer (CreatePlayerDto) returns (GetPlayerDto);
+  rpc UpdatePlayer (UpdatePlayerDto) returns (GetPlayerDto);
+  rpc DeletePlayer (RequestEntity) returns (google.protobuf.Empty);
+}
+
+// Room service
+service RoomService {
+  rpc GetRoom (RequestEntity) returns (GetRoomDto);
+  rpc GetAllRooms (google.protobuf.Empty) returns (RoomList);
+  rpc CreateRoom (CreateRoomDto) returns (GetRoomDto);
+  rpc UpdateRoom (UpdateRoomDto) returns (GetRoomDto);
+  rpc DeleteRoom (RequestEntity) returns (google.protobuf.Empty);
+}
+
+// Board service
+service BoardService {
+  rpc GetBoard (RequestEntity) returns (GetBoardDto);
+  rpc GetAllBoards (google.protobuf.Empty) returns (BoardList);
+  rpc CreateBoard (CreateBoardDto) returns (GetBoardDto);
+  rpc UpdateBoard (UpdateBoardDto) returns (GetBoardDto);
+  rpc DeleteBoard (RequestEntity) returns (google.protobuf.Empty);
+}
+
+// Game service
+service GameService {
+  rpc GetGame (RequestEntity) returns (GetGameDto);
+  rpc GetAllGames (google.protobuf.Empty) returns (GameList);
+  rpc CreateGame (google.protobuf.Empty) returns (GetGameDto);
+  rpc DeleteGame (RequestEntity) returns (google.protobuf.Empty);
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,11 +11,12 @@ import (
 	"syscall"
 
 	"github.com/joho/godotenv"
-	"github.com/moLIart/go-course/internal/handlers"
+	"github.com/moLIart/go-course/internal"
+	"github.com/moLIart/go-course/internal/grpc/generated"
+	"github.com/moLIart/go-course/internal/grpc/services"
 	"github.com/moLIart/go-course/internal/middlewares"
 	"github.com/moLIart/go-course/internal/repository"
-
-	"github.com/julienschmidt/httprouter"
+	"google.golang.org/grpc"
 )
 
 // @title						Test API Server
@@ -25,45 +27,25 @@ import (
 // @in							header
 // @name						Authorization
 func main() {
-	err := godotenv.Load("../.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	repository.LoadData()
-
 	middlewares.SetJwtSecret(os.Getenv("JWT_SECRET"))
 
-	router := httprouter.New()
-	router.POST("/players", middlewares.JWTAuth(handlers.CreatePlayerHandler))
-	router.GET("/players", handlers.GetPlayersHandler)
-	router.GET("/players/:id", handlers.GetPlayerByIDHandler)
-	router.PUT("/players/:id", middlewares.JWTAuth(handlers.UpdatePlayerHandler))
-	router.DELETE("/players/:id", middlewares.JWTAuth(handlers.DeletePlayerByIDHandler))
+	repository.LoadData()
 
-	router.POST("/rooms", middlewares.JWTAuth(handlers.CreateRoomHandler))
-	router.GET("/rooms", handlers.GetRoomsHandler)
-	router.GET("/rooms/:id", handlers.GetRoomByIDHandler)
-	router.PUT("/rooms/:id", middlewares.JWTAuth(handlers.UpdateRoomHandler))
-	router.DELETE("/rooms/:id", middlewares.JWTAuth(handlers.DeleteRoomHandler))
-
-	router.POST("/boards", middlewares.JWTAuth(handlers.CreateBoardHandler))
-	router.GET("/boards", handlers.GetBoardsHandler)
-	router.GET("/boards/:id", handlers.GetBoardByIDHandler)
-	router.PUT("/boards/:id", middlewares.JWTAuth(handlers.UpdateBoardHandler))
-	router.DELETE("/boards/:id", middlewares.JWTAuth(handlers.DeleteBoardHandler))
-
-	router.POST("/games", middlewares.JWTAuth(handlers.CreateGameHandler))
-	router.GET("/games", handlers.GetGamesHandler)
-	router.GET("/games/:id", handlers.GetGameByIDHandler)
-	router.DELETE("/games/:id", middlewares.JWTAuth(handlers.DeleteGameHandler))
-
-	router.Handler("GET", "/swagger/*any", handlers.SwaggerUIHandler())
-
-	srv := &http.Server{
-		Addr:    ":8081",
-		Handler: router,
+	httpSrv := &http.Server{
+		Addr:    ":8080",
+		Handler: internal.RegisterHTTPRoutes(),
 	}
+
+	grpcSvc := grpc.NewServer()
+	generated.RegisterBoardServiceServer(grpcSvc, &services.BoardService{})
+	generated.RegisterGameServiceServer(grpcSvc, &services.GameService{})
+	generated.RegisterPlayerServiceServer(grpcSvc, &services.PlayerService{})
+	generated.RegisterRoomServiceServer(grpcSvc, &services.RoomService{})
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
@@ -73,17 +55,34 @@ func main() {
 	go func() {
 		defer wg.Done()
 		<-signalChan
-		log.Println("Shutting down server...")
 
-		if err := srv.Shutdown(context.Background()); err != nil {
-			log.Fatalf("Server forced to shutdown: %s", err)
+		log.Println("Shutting down HTTP server...")
+		if err := httpSrv.Shutdown(context.Background()); err != nil {
+			log.Fatalf("HTTP Server forced to shutdown: %s", err)
+		}
+
+		log.Println("Shutting down gRPC server...")
+		grpcSvc.GracefulStop()
+	}()
+
+	go func() {
+		log.Println("Starting HTTP server on :8080")
+		if err := httpSrv.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("Could not start HTTP server: %s", err)
 		}
 	}()
 
-	log.Println("Starting server on :8081")
-	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-		log.Fatalf("Could not start server: %s", err)
-	}
+	go func() {
+		log.Println("Starting gRPC server on :8081")
+		lis, err := net.Listen("tcp", ":8081")
+		if err != nil {
+			log.Fatalf("Failed to listen: %v", err)
+		}
+
+		if err := grpcSvc.Serve(lis); err != nil {
+			log.Fatalf("Failed to serve gRPC server: %v", err)
+		}
+	}()
 
 	wg.Wait()
 	log.Println("Server gracefully stopped")
