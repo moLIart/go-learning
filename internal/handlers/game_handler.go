@@ -35,7 +35,12 @@ func CreateGameHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //	@Failure		500	{string}	string	"Failed to encode games"
 //	@Router			/games [get]
 func GetGamesHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	games := repository.GetGames()
+	games, err := repository.GetGames()
+	if err != nil {
+		http.Error(w, "Failed to retrieve games", http.StatusInternalServerError)
+		return
+	}
+
 	gameDtos := make([]dto.GetGameDto, len(games))
 	for i, game := range games {
 		gameDtos[i] = dto.GetGameDto{ID: game.ID}
@@ -65,8 +70,8 @@ func GetGameByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 
-	game := repository.GetGameByID(id)
-	if game == nil {
+	game, err := repository.GetGameByID(id)
+	if game == nil || err != nil {
 		http.Error(w, "Game not found", http.StatusNotFound)
 		return
 	}
@@ -96,7 +101,13 @@ func DeleteGameHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
-	if !repository.DeleteGameByID(id) {
+	ok, err := repository.DeleteGameByID(id)
+	if err != nil {
+		http.Error(w, "Failed to delete game", http.StatusInternalServerError)
+		return
+	}
+
+	if !ok {
 		http.Error(w, "Game not found", http.StatusNotFound)
 		return
 	}

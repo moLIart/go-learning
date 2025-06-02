@@ -16,7 +16,11 @@ type RoomService struct {
 }
 
 func (s *RoomService) GetRoom(ctx context.Context, req *generated.RequestEntity) (*generated.GetRoomDto, error) {
-	r := repository.GetRoomByID(int(req.Id))
+	r, err := repository.GetRoomByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if r == nil {
 		return nil, status.Errorf(codes.NotFound, "room not found")
 	}
@@ -27,7 +31,11 @@ func (s *RoomService) GetRoom(ctx context.Context, req *generated.RequestEntity)
 }
 
 func (s *RoomService) GetAllRooms(ctx context.Context, _ *emptypb.Empty) (*generated.RoomList, error) {
-	rooms := repository.GetRooms()
+	rooms, err := repository.GetRooms()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	roomDtos := make([]*generated.GetRoomDto, len(rooms))
 	for i, r := range rooms {
 		roomDtos[i] = &generated.GetRoomDto{
@@ -48,11 +56,20 @@ func (s *RoomService) CreateRoom(ctx context.Context, req *generated.CreateRoomD
 }
 
 func (s *RoomService) UpdateRoom(ctx context.Context, req *generated.UpdateRoomDto) (*generated.GetRoomDto, error) {
-	ok := repository.UpdateRoomByID(int(req.Id), req.Code)
+	ok, err := repository.UpdateRoomByID(int(req.Id), req.Code)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if !ok {
 		return nil, status.Errorf(codes.NotFound, "room not found")
 	}
-	r := repository.GetRoomByID(int(req.Id))
+
+	r, err := repository.GetRoomByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	return &generated.GetRoomDto{
 		Id:   int32(r.ID),
 		Code: r.Code,
@@ -60,7 +77,11 @@ func (s *RoomService) UpdateRoom(ctx context.Context, req *generated.UpdateRoomD
 }
 
 func (s *RoomService) DeleteRoom(ctx context.Context, req *generated.RequestEntity) (*emptypb.Empty, error) {
-	ok := repository.DeleteRoomByID(int(req.Id))
+	ok, err := repository.DeleteRoomByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if !ok {
 		return nil, status.Errorf(codes.NotFound, "room not found")
 	}

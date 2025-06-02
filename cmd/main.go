@@ -27,14 +27,14 @@ import (
 // @in							header
 // @name						Authorization
 func main() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
 	middlewares.SetJwtSecret(os.Getenv("JWT_SECRET"))
 
-	repository.LoadData()
+	repository.Startup(os.Getenv("MONGO_DS"), os.Getenv("REDIS_DS"))
 
 	httpSrv := &http.Server{
 		Addr:    ":8080",

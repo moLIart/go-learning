@@ -16,7 +16,11 @@ type GameService struct {
 }
 
 func (s *GameService) GetGame(ctx context.Context, req *generated.RequestEntity) (*generated.GetGameDto, error) {
-	g := repository.GetGameByID(int(req.Id))
+	g, err := repository.GetGameByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if g == nil {
 		return nil, status.Errorf(codes.NotFound, "game not found")
 	}
@@ -26,7 +30,11 @@ func (s *GameService) GetGame(ctx context.Context, req *generated.RequestEntity)
 }
 
 func (s *GameService) GetAllGames(ctx context.Context, _ *emptypb.Empty) (*generated.GameList, error) {
-	games := repository.GetGames()
+	games, err := repository.GetGames()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	gameDtos := make([]*generated.GetGameDto, len(games))
 	for i, g := range games {
 		gameDtos[i] = &generated.GetGameDto{
@@ -45,7 +53,11 @@ func (s *GameService) CreateGame(ctx context.Context, _ *emptypb.Empty) (*genera
 }
 
 func (s *GameService) DeleteGame(ctx context.Context, req *generated.RequestEntity) (*emptypb.Empty, error) {
-	ok := repository.DeleteGameByID(int(req.Id))
+	ok, err := repository.DeleteGameByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if !ok {
 		return nil, status.Errorf(codes.NotFound, "game not found")
 	}

@@ -45,7 +45,12 @@ func CreatePlayerHandler(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //	@Failure		500	{string}	string	"Failed to encode players"
 //	@Router			/players [get]
 func GetPlayersHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	players := repository.GetPlayers()
+	players, err := repository.GetPlayers()
+	if err != nil {
+		http.Error(w, "Failed to retrieve players", http.StatusInternalServerError)
+		return
+	}
+
 	playerDtos := make([]dto.GetPlayerDto, len(players))
 	for i, player := range players {
 		playerDtos[i] = dto.GetPlayerDto{ID: player.ID, Name: player.Name}
@@ -75,7 +80,12 @@ func GetPlayerByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.
 		return
 	}
 
-	player := repository.GetPlayerByID(id)
+	player, err := repository.GetPlayerByID(id)
+	if err != nil {
+		http.Error(w, "Failed to retrieve player", http.StatusInternalServerError)
+		return
+	}
+
 	if player == nil {
 		http.Error(w, "Player not found", http.StatusNotFound)
 		return
@@ -106,7 +116,13 @@ func DeletePlayerByIDHandler(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	if !repository.DeletePlayerByID(id) {
+	ok, err := repository.DeletePlayerByID(id)
+	if err != nil {
+		http.Error(w, "Failed to delete player", http.StatusInternalServerError)
+		return
+	}
+
+	if !ok {
 		http.Error(w, "Player not found", http.StatusNotFound)
 		return
 	}
@@ -140,7 +156,13 @@ func UpdatePlayerHandler(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	if !repository.UpdatePlayerByID(id, playerDto.Name) {
+	ok, err := repository.UpdatePlayerByID(id, playerDto.Name)
+	if err != nil {
+		http.Error(w, "Failed to update player", http.StatusInternalServerError)
+		return
+	}
+
+	if !ok {
 		http.Error(w, "Player not found", http.StatusNotFound)
 		return
 	}

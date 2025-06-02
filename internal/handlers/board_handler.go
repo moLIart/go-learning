@@ -46,7 +46,12 @@ func CreateBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 //	@Failure		500	{string}	string	"Failed to encode boards"
 //	@Router			/boards [get]
 func GetBoardsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	boards := repository.GetBoards()
+	boards, err := repository.GetBoards()
+	if err != nil {
+		http.Error(w, "Failed to retrieve boards", http.StatusInternalServerError)
+		return
+	}
+
 	boardDtos := make([]dto.GetBoardDto, len(boards))
 	for i, board := range boards {
 		boardDtos[i] = dto.GetBoardDto{ID: board.ID, Size: board.Size}
@@ -76,7 +81,8 @@ func GetBoardByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		return
 	}
 
-	board := repository.GetBoardByID(id)
+	board, err := repository.GetBoardByID(id)
+
 	if board == nil {
 		http.Error(w, "Board not found", http.StatusNotFound)
 		return
@@ -107,7 +113,13 @@ func DeleteBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 
-	if !repository.DeleteBoardByID(id) {
+	ok, err := repository.DeleteBoardByID(id)
+	if err != nil {
+		http.Error(w, "Failed to delete board", http.StatusInternalServerError)
+		return
+	}
+
+	if !ok {
 		http.Error(w, "Board not found", http.StatusNotFound)
 		return
 	}
@@ -141,7 +153,13 @@ func UpdateBoardHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 
-	if !repository.UpdateBoardByID(id, boardDto.Size) {
+	ok, err := repository.UpdateBoardByID(id, boardDto.Size)
+	if err != nil {
+		http.Error(w, "Failed to update board", http.StatusInternalServerError)
+		return
+	}
+
+	if !ok {
 		http.Error(w, "Board not found", http.StatusNotFound)
 		return
 	}
