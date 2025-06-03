@@ -9,9 +9,9 @@ const (
 )
 
 type Board struct {
-	ID    int
-	Size  int
-	Cells [][]CellState
+	ID    int           `json:"id" bson:"_id"`
+	Size  int           `json:"size" bson:"size"`
+	Cells [][]CellState `json:"cells" bson:"cells"`
 }
 
 func (b Board) GetSize() int {

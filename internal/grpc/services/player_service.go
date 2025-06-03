@@ -16,7 +16,11 @@ type PlayerService struct {
 }
 
 func (s *PlayerService) GetPlayer(ctx context.Context, req *generated.RequestEntity) (*generated.GetPlayerDto, error) {
-	player := repository.GetPlayerByID(int(req.Id))
+	player, err := repository.GetPlayerByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if player == nil {
 		return nil, status.Errorf(codes.NotFound, "player not found")
 	}
@@ -27,7 +31,11 @@ func (s *PlayerService) GetPlayer(ctx context.Context, req *generated.RequestEnt
 }
 
 func (s *PlayerService) GetAllPlayers(ctx context.Context, _ *emptypb.Empty) (*generated.PlayerList, error) {
-	players := repository.GetPlayers()
+	players, err := repository.GetPlayers()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	playerDtos := make([]*generated.GetPlayerDto, len(players))
 	for i, player := range players {
 		playerDtos[i] = &generated.GetPlayerDto{
@@ -48,11 +56,19 @@ func (s *PlayerService) CreatePlayer(ctx context.Context, req *generated.CreateP
 }
 
 func (s *PlayerService) UpdatePlayer(ctx context.Context, req *generated.UpdatePlayerDto) (*generated.GetPlayerDto, error) {
-	ok := repository.UpdatePlayerByID(int(req.Id), req.Name)
+	ok, err := repository.UpdatePlayerByID(int(req.Id), req.Name)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if !ok {
 		return nil, status.Errorf(codes.NotFound, "player not found")
 	}
-	player := repository.GetPlayerByID(int(req.Id))
+	player, err := repository.GetPlayerByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	return &generated.GetPlayerDto{
 		Id:   int32(player.ID),
 		Name: player.Name,
@@ -60,7 +76,11 @@ func (s *PlayerService) UpdatePlayer(ctx context.Context, req *generated.UpdateP
 }
 
 func (s *PlayerService) DeletePlayer(ctx context.Context, req *generated.RequestEntity) (*emptypb.Empty, error) {
-	ok := repository.DeletePlayerByID(int(req.Id))
+	ok, err := repository.DeletePlayerByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if !ok {
 		return nil, status.Errorf(codes.NotFound, "player not found")
 	}

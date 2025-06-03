@@ -5,10 +5,10 @@ import (
 )
 
 type Room struct {
-	ID      int
-	Code    string
-	Players [2]*Player
-	Game    *game.Game
+	ID      int        `json:"id" bson:"_id"`
+	Code    string     `json:"code" bson:"code"`
+	Players [2]*Player `json:"players" bson:"players"`
+	Game    *game.Game `json:"game" bson:"game"`
 }
 
 func NewRoom(code string) *Room {

@@ -16,7 +16,11 @@ type BoardService struct {
 }
 
 func (s *BoardService) GetBoard(ctx context.Context, req *generated.RequestEntity) (*generated.GetBoardDto, error) {
-	board := repository.GetBoardByID(int(req.Id))
+	board, err := repository.GetBoardByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if board == nil {
 		return nil, status.Errorf(codes.NotFound, "board not found")
 	}
@@ -27,7 +31,11 @@ func (s *BoardService) GetBoard(ctx context.Context, req *generated.RequestEntit
 }
 
 func (s *BoardService) GetAllBoards(ctx context.Context, _ *emptypb.Empty) (*generated.BoardList, error) {
-	boards := repository.GetBoards()
+	boards, err := repository.GetBoards()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	boardDtos := make([]*generated.GetBoardDto, len(boards))
 	for i, board := range boards {
 		boardDtos[i] = &generated.GetBoardDto{
@@ -48,11 +56,20 @@ func (s *BoardService) CreateBoard(ctx context.Context, req *generated.CreateBoa
 }
 
 func (s *BoardService) UpdateBoard(ctx context.Context, req *generated.UpdateBoardDto) (*generated.GetBoardDto, error) {
-	ok := repository.UpdateBoardByID(int(req.Id), int(req.Size))
+	ok, err := repository.UpdateBoardByID(int(req.Id), int(req.Size))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if !ok {
 		return nil, status.Errorf(codes.NotFound, "board not found")
 	}
-	board := repository.GetBoardByID(int(req.Id))
+
+	board, err := repository.GetBoardByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	return &generated.GetBoardDto{
 		Id:   int32(board.ID),
 		Size: int32(board.Size),
@@ -60,7 +77,11 @@ func (s *BoardService) UpdateBoard(ctx context.Context, req *generated.UpdateBoa
 }
 
 func (s *BoardService) DeleteBoard(ctx context.Context, req *generated.RequestEntity) (*emptypb.Empty, error) {
-	ok := repository.DeleteBoardByID(int(req.Id))
+	ok, err := repository.DeleteBoardByID(int(req.Id))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
+	}
+
 	if !ok {
 		return nil, status.Errorf(codes.NotFound, "board not found")
 	}

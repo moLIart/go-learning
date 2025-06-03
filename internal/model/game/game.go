@@ -10,10 +10,10 @@ const (
 )
 
 type Game struct {
-	ID          int
-	Board       *Board
-	CurrentTurn CellState
-	Status      GameStatus
+	ID          int        `json:"id" bson:"_id"`
+	Board       *Board     `json:"board" bson:"board,omitempty"`
+	CurrentTurn CellState  `json:"current_turn" bson:"current_turn"`
+	Status      GameStatus `json:"status" bson:"status"`
 }
 
 type GameOption func(*Game)

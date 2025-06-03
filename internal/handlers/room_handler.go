@@ -47,7 +47,12 @@ func CreateRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //	@Failure		500	{string}	string	"Failed to encode rooms"
 //	@Router			/rooms [get]
 func GetRoomsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	rooms := repository.GetRooms()
+	rooms, err := repository.GetRooms()
+	if err != nil {
+		http.Error(w, "Failed to retrieve rooms", http.StatusInternalServerError)
+		return
+	}
+
 	roomDtos := make([]dto.GetRoomDto, len(rooms))
 	for i, room := range rooms {
 		roomDtos[i] = dto.GetRoomDto{ID: room.ID, Code: room.Code}
@@ -77,7 +82,12 @@ func GetRoomByIDHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 
-	room := repository.GetRoomByID(id)
+	room, err := repository.GetRoomByID(id)
+	if err != nil {
+		http.Error(w, "Failed to retrieve room", http.StatusInternalServerError)
+		return
+	}
+
 	if room == nil {
 		http.Error(w, "Room not found", http.StatusNotFound)
 		return
@@ -108,7 +118,13 @@ func DeleteRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
-	if !repository.DeleteRoomByID(id) {
+	ok, err := repository.DeleteRoomByID(id)
+	if err != nil {
+		http.Error(w, "Failed to delete room", http.StatusInternalServerError)
+		return
+	}
+
+	if !ok {
 		http.Error(w, "Room not found", http.StatusNotFound)
 		return
 	}
@@ -142,7 +158,13 @@ func UpdateRoomHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
-	if !repository.UpdateRoomByID(id, roomDto.Code) {
+	ok, err := repository.UpdateRoomByID(id, roomDto.Code)
+	if err != nil {
+		http.Error(w, "Failed to update room", http.StatusInternalServerError)
+		return
+	}
+
+	if !ok {
 		http.Error(w, "Room not found", http.StatusNotFound)
 		return
 	}

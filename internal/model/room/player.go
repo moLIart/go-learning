@@ -1,8 +1,8 @@
 package room
 
 type Player struct {
-	ID   int
-	Name string
+	ID   int    `json:"id" bson:"_id"`
+	Name string `json:"name" bson:"name"`
 }
 
 func NewPlayer(name string) *Player {
